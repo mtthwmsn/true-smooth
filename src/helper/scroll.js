@@ -1,21 +1,4 @@
-function Helper() {
-	//this.scroll = new HelperScroll();
-
-
-	this.getScrollDistance = () => {
-		return window.pageYOffset
-		    | (document.documentElement||document.body.parentNode||document.body).scrollTop;
-	};
-
-	this.onScroll = (callback) => {
-		if (typeof callback === "function") {
-			return new HelperScroll(callback);
-		}
-	}
-
-	return this;
-}
-;function HelperScroll(callback) {
+function HelperScroll(callback) {
 	let lastScrollTop = helper.getScrollDistance();
 	let rAF = window.requestAnimationFrame ||
 	          window.webkitRequestAnimationFrame ||
@@ -45,9 +28,3 @@ function Helper() {
 		rAF(listen);
 	}
 }
-;console.log('welcome! start scrolling.');
-
-const helper = new Helper();
-helper.onScroll((distance) => {
-	console.log('scroll distance: '+distance);
-});

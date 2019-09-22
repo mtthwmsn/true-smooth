@@ -6,10 +6,7 @@ module.exports = function(grunt) {
 				separator: ';',
 			},
 			dist: {
-				src: [
-					'src/helper/*.js',
-					'src/true-smooth.js'
-				],
+				src: 'src/**/*.js',
 				dest: 'dist/true-smooth.js',
 			}
 		},
