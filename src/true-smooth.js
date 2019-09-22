@@ -1,6 +1,11 @@
-console.log('welcome! start scrolling.');
 
-const helper = new Helper();
-helper.onScroll((distance) => {
-	console.log('scroll distance: '+distance);
-});
+var TrueSmooth = function() {
+	this.helper = new TrueSmoothHelper();
+	this.helper.onScroll((distance) => {
+		console.log('scroll distance: '+distance);
+	});
+}
+
+
+
+var test = new TrueSmooth();

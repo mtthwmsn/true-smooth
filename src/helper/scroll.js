@@ -1,4 +1,4 @@
-function HelperScroll(callback) {
+TrueSmoothHelper.prototype.registerHelperScroll = function(helper, callback) {
 	let lastScrollTop = helper.getScrollDistance();
 	let rAF = window.requestAnimationFrame ||
 	          window.webkitRequestAnimationFrame ||
@@ -6,10 +6,8 @@ function HelperScroll(callback) {
 	          window.msRequestAnimationFrame ||
 	          window.oRequestAnimationFrame;
 
-	// start listening immediateley
-	if (typeof callback === "function") {
-		listen();
-	}
+	// start listening immediately
+	listen();
 
 	/**
 	* listen() continously triggers on requestAnimationFrame, executing the
