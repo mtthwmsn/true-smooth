@@ -1,1 +1,5 @@
 # true-smooth
+
+```
+grunt dev
+```

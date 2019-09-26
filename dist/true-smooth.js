@@ -1,8 +1,8 @@
 console.log('welcome! start scrolling.');
 
-// register the helper
-var TrueSmoothHelper = function() { this.register() };
-;TrueSmoothHelper.prototype.register = function() {
+// register the service
+var TrueSmoothService = function() { this.register() };
+;TrueSmoothService.prototype.register = function() {
 	/**
 	 * getScrollDistance() returns the vertical scroll distance
 	 *
@@ -19,13 +19,21 @@ var TrueSmoothHelper = function() { this.register() };
 	 * @return void
 	 */
 	this.onScroll = (callback) => {
-		this.registerHelperScroll(this, callback);
+		this.registerServiceScroll(this, callback);
 	};
 
 	return this;
 }
-;TrueSmoothHelper.prototype.registerHelperScroll = function(helper, callback) {
-	let lastScrollTop = helper.getScrollDistance();
+;TrueSmoothService.prototype.item = function(el) {
+	let item = {};
+	    item.el = el;
+	    item.zIndex = el.dataset.zIndex || 1;
+	    item.scrollRatio = el.dataset.scrollRatio || 1;
+
+	return item;
+};
+;TrueSmoothService.prototype.registerServiceScroll = function(service, callback) {
+	let lastScrollTop = service.getScrollDistance();
 	let rAF = window.requestAnimationFrame ||
 	          window.webkitRequestAnimationFrame ||
 	          window.mozRequestAnimationFrame ||
@@ -42,7 +50,7 @@ var TrueSmoothHelper = function() { this.register() };
 	* return void
 	*/
 	function listen() {
-		let scrollTop = helper.getScrollDistance();
+		let scrollTop = service.getScrollDistance();
 		if (lastScrollTop === scrollTop) {
 			rAF(listen);
 			return;
@@ -53,13 +61,28 @@ var TrueSmoothHelper = function() { this.register() };
 	}
 }
 ;
-var TrueSmooth = function() {
-	this.helper = new TrueSmoothHelper();
-	this.helper.onScroll((distance) => {
+var TrueSmooth = function(el) {
+	var context = this;
+
+	this.service = new TrueSmoothService();
+	this.service.onScroll((distance) => {
 		console.log('scroll distance: '+distance);
 	});
+
+	this.container = el;
+	this.items = [];
+	getItems();
+
+	function getItems() {
+		context.container.querySelectorAll('[data-true-smooth-item]').forEach((el, i) => {
+			context.items.push(context.service.item(el));
+		});
+		console.log(context.items);
+	}
+
 }
 
 
 
-var test = new TrueSmooth();
+var container = document.querySelector(".true-smooth");
+var test = new TrueSmooth(container);

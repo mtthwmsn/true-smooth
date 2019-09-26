@@ -1,4 +1,4 @@
-TrueSmoothHelper.prototype.register = function() {
+TrueSmoothService.prototype.register = function() {
 	/**
 	 * getScrollDistance() returns the vertical scroll distance
 	 *
@@ -15,7 +15,7 @@ TrueSmoothHelper.prototype.register = function() {
 	 * @return void
 	 */
 	this.onScroll = (callback) => {
-		this.registerHelperScroll(this, callback);
+		this.registerServiceScroll(this, callback);
 	};
 
 	return this;

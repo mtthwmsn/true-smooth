@@ -1,5 +1,5 @@
-TrueSmoothHelper.prototype.registerHelperScroll = function(helper, callback) {
-	let lastScrollTop = helper.getScrollDistance();
+TrueSmoothService.prototype.registerServiceScroll = function(service, callback) {
+	let lastScrollTop = service.getScrollDistance();
 	let rAF = window.requestAnimationFrame ||
 	          window.webkitRequestAnimationFrame ||
 	          window.mozRequestAnimationFrame ||
@@ -16,7 +16,7 @@ TrueSmoothHelper.prototype.registerHelperScroll = function(helper, callback) {
 	* return void
 	*/
 	function listen() {
-		let scrollTop = helper.getScrollDistance();
+		let scrollTop = service.getScrollDistance();
 		if (lastScrollTop === scrollTop) {
 			rAF(listen);
 			return;
