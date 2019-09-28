@@ -1,4 +1,4 @@
-TrueSmoothService.prototype.register = function() {
+TrueSmoothService.prototype.register = function(instance) {
 	/**
 	 * getScrollDistance() returns the vertical scroll distance
 	 *
@@ -16,6 +16,15 @@ TrueSmoothService.prototype.register = function() {
 	 */
 	this.onScroll = (callback) => {
 		this.registerServiceScroll(this, callback);
+	};
+
+	/**
+	 * registerItem() registers a new item
+	 *
+	 * @return object
+	 */
+	this.registerItem = (el) => {
+		return new TrueSmoothItem(el, instance);
 	};
 
 	return this;
