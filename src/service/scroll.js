@@ -21,8 +21,12 @@ TrueSmoothService.prototype.registerServiceScroll = function(service, callback) 
 			rAF(listen);
 			return;
 		}
+		let scrollDir = scrollTop > lastScrollTop ? "down" : "up";
 		lastScrollTop = scrollTop;
-		callback(lastScrollTop);
+		callback({
+			y: lastScrollTop,
+			dir: scrollDir
+		});
 		rAF(listen);
 	}
 }
