@@ -88,6 +88,7 @@ var TrueSmoothService = function(instance) { this.register(instance) };
 	this.anchor = null;
 	this.state = "initial";
 	this.offsetY = 0;
+	this.scrollYOffset = 0;
 	this.zIndex = el.dataset.zIndex || 1;
 	this.scrollRatio = el.dataset.scrollRatio || 1;
 	this.initialStyle = {};
@@ -110,24 +111,23 @@ var TrueSmoothService = function(instance) { this.register(instance) };
 
 
 TrueSmoothItem.prototype.scroll = function(scrollY) {
-	//this.el.style.transform = "translate3d(0, "+scrollY+"px, 0)";
-	if (this.state === "scroll") return;
-	this.state = "scroll";
-
-	console.log('keep scrolling');
-
-	this.el.style.position = "fixed";
+	if (this.state !== "scroll") {
+		this.el.style.position = "fixed";
+		this.state = "scroll";
+	}
+	// get ratio adjusted scroll distance
+	this.scrollYOffset = (scrollY*this.scrollRatio) - scrollY;
+	// calculate offset Y and translate
 	let offsetY = 0;
 	    offsetY += parseInt(this.initialStyle.top);
 	    offsetY += parseInt(this.initialStyle.marginTop);
+	    offsetY += this.scrollYOffset;
 	this.el.style.transform = "translate3d(0, "+offsetY+"px, 0)";
 };
 
 TrueSmoothItem.prototype.scrollAnchor = function(scrollY) {
 	if (this.state === "anchored") return;
 	this.state = "anchored";
-
-	console.log('STOP scrolling', this.getOffsetY(scrollY));
 
 	// fix absolutely to anchor point
 	this.el.style.position = "absolute";
@@ -147,6 +147,8 @@ TrueSmoothItem.prototype.getOffsetY = function(scrollY) {
 	}
 	// offset by the scroll distance
 	offsetY += scrollY;
+	// offset by scrollYOffset distance
+	offsetY += this.scrollYOffset;
 
 	return offsetY;
 };
