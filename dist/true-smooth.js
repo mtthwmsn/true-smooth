@@ -93,6 +93,11 @@ var TrueSmoothService = function(instance) { this.register(instance) };
 	this.scrollRatio = el.dataset.scrollRatio || 1;
 	this.initialStyle = {};
 
+	// create events to fire on start/stop scroll
+	this.startScrollEvent = new Event('ts.scrollitem.start');
+	this.endScrollEvent = new Event('ts.scrollitem.stop');
+
+
 	// set initial styles and listen for viewport changes to set again
 	this.setInitialStyle();
 	//instance.service.onViewportResize((v) => {
@@ -101,7 +106,6 @@ var TrueSmoothService = function(instance) { this.register(instance) };
 
 	this.setAnchor();
 
-
 	if (this.error.length) {
 		console.log(this.error);
 	}
@@ -109,14 +113,19 @@ var TrueSmoothService = function(instance) { this.register(instance) };
 	return this;
 };
 
-
-TrueSmoothItem.prototype.scroll = function(scrollY) {
+/**
+ * scroll() is fired when the item is scrolling to anchor point
+ *
+ * @return void
+ */
+TrueSmoothItem.prototype.scroll = function() {
 	if (this.state !== "scroll") {
 		this.el.style.position = "fixed";
 		this.state = "scroll";
+		this.el.dispatchEvent(this.startScrollEvent);
 	}
 	// get ratio adjusted scroll distance
-	this.scrollYOffset = (scrollY*this.scrollRatio) - scrollY;
+	this.scrollYOffset = (this.instance.scrollY*this.scrollRatio) - this.instance.scrollY;
 	// calculate offset Y and translate
 	let offsetY = 0;
 	    offsetY += parseInt(this.initialStyle.top);
@@ -125,7 +134,12 @@ TrueSmoothItem.prototype.scroll = function(scrollY) {
 	this.el.style.transform = "translate3d(0, "+offsetY+"px, 0)";
 };
 
-TrueSmoothItem.prototype.scrollAnchor = function(scrollY) {
+/**
+ * scrollAnchor() is fired when item has reached its anchor point
+ *
+ * @return void
+ */
+TrueSmoothItem.prototype.scrollAnchor = function() {
 	if (this.state === "anchored") return;
 	this.state = "anchored";
 
@@ -136,17 +150,23 @@ TrueSmoothItem.prototype.scrollAnchor = function(scrollY) {
 		offsetY -= parseInt(this.el.offsetHeight);
 	}
 	this.el.style.transform = "translate3d(0, "+offsetY+"px, 0)";
+	// fire stop scroll event
+	this.el.dispatchEvent(this.endScrollEvent);
 };
 
-
-TrueSmoothItem.prototype.getOffsetY = function(scrollY) {
+/**
+ * getOffsetY() returns the vertical offset position of the item
+ *
+ * @return int
+ */
+TrueSmoothItem.prototype.getOffsetY = function() {
 	let offsetY = this.offsetY;
 	// offset by height of element if point is bottom
 	if (this.anchor.itemPoint === "bottom") {
 		offsetY += this.el.offsetHeight;
 	}
 	// offset by the scroll distance
-	offsetY += scrollY;
+	offsetY += this.instance.scrollY;
 	// offset by scrollYOffset distance
 	offsetY += this.scrollYOffset;
 
@@ -254,69 +274,44 @@ TrueSmoothItem.prototype.setAnchor = function() {
 	}
 }
 ;var TrueSmooth = function(el) {
+	// store context to this instance
 	var context = this;
-
+	// register the service
 	this.service = new TrueSmoothService(this);
 
 	this.container = el;
 	this.items = [];
-	getItems();
+	this.scrollY = 0;
+	registerItems();
 
-	function getItems() {
+	this.getItems = function() {
+		let items = [];
+		context.items.forEach((item) => { items.push(item.el) });
+		return items;
+	};
+
+	// start listening for scroll
+	this.service.onScroll((scroll) => {
+		// update the vertical scroll position in this instance
+		this.scrollY = scroll.y;
+		// scroll or anchor each item
+		this.items.forEach((item) => {
+			if (item.getOffsetY(scroll.y) > item.anchor.offsetY)
+				item.scrollAnchor(scroll.y);
+			else
+				item.scroll(scroll.y);
+		});
+	});
+
+	// define properties to expose
+	return {
+		getItems: this.getItems
+	}
+////////////////////////////////////////////////////////////////////////////////
+
+	function registerItems() {
 		context.container.querySelectorAll('[data-true-smooth-item]').forEach((el, i) => {
 			context.items.push(context.service.registerItem(el));
 		});
 	}
-
-	this.service.onScroll((scroll) => {
-
-		//console.log(scroll.y, scroll.dir);
-
-		this.items.forEach((item) => {
-
-			console.log('offsetY', item.getOffsetY(scroll.y), item.anchor.offsetY);
-
-			//
-			if (item.getOffsetY(scroll.y) > item.anchor.offsetY) {
-				item.scrollAnchor(scroll.y);
-			}
-			else {
-				item.scroll(scroll.y);
-			}
-
-		});
-	});
-
-
-
-	//this.service.onScroll((distance) => {
-	//	this.items.forEach((item) => {
-	//		let treshold = (item.el.offsetTop + item.el.offsetHeight + (distance * 2));
-	//		console.log(treshold, item.anchor.offsetY);
-	//		if (item.anchor.offsetY > treshold) {
-	//			item.el.style.transform = "translate3d(0, "+distance+"px, 0)";
-	//			setTimeout(function() {
-	//				item.el.style.transition = "transform 0.125s ease";
-	//			}, 0);
-	//			item.el.style.position = "fixed";
-	//			item.el.dataset.on = 1;
-	//		}
-	//		else {
-	//			if (item.el.dataset.on == 1) {
-	//				console.log("HERE", item.el.offsetTop, item.top, item.el.offsetHeight, item.anchor.offsetY);
-	//				item.el.dataset.on = null;
-	//				item.el.style.transition = "";
-	//				item.el.style.transform = "translate3d(0, "+(item.anchor.offsetY - item.el.offsetHeight - item.top)+"px, 0)";
-	//				item.el.style.position = "absolute";
-	//			}
-	//		}
-	//	});
-	//});
-
-
-}
-
-
-
-var container = document.querySelector(".true-smooth");
-var test = new TrueSmooth(container);
+};

@@ -13,7 +13,7 @@
 		     data-true-smooth-item
 		     data-anchor="_parent:bottom:bottom:1000"
 		     data-index="1"
-		     data-scroll-ratio="2">
+		     data-scroll-ratio="1">
 			Index 1
 		</div>
 		<!--
@@ -30,5 +30,17 @@
 	</div>
 
 	<script src="../dist/true-smooth.min.js"></script>
+	<script>
+	var container = document.querySelector(".true-smooth");
+	var test = new TrueSmooth(container);
+	var testItems = test.getItems();
+	// example of events
+	testItems[0].addEventListener("ts.scrollitem.start", function() {
+		console.log('first item started scrolling');
+	});
+	testItems[0].addEventListener("ts.scrollitem.stop", function() {
+		console.log('first item stopped scrolling');
+	});
+	</script>
 </body>
 </html>

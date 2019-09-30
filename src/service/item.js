@@ -12,6 +12,11 @@ var TrueSmoothItem = function(el, instance) {
 	this.scrollRatio = el.dataset.scrollRatio || 1;
 	this.initialStyle = {};
 
+	// create events to fire on start/stop scroll
+	this.startScrollEvent = new Event('ts.scrollitem.start');
+	this.endScrollEvent = new Event('ts.scrollitem.stop');
+
+
 	// set initial styles and listen for viewport changes to set again
 	this.setInitialStyle();
 	//instance.service.onViewportResize((v) => {
@@ -20,7 +25,6 @@ var TrueSmoothItem = function(el, instance) {
 
 	this.setAnchor();
 
-
 	if (this.error.length) {
 		console.log(this.error);
 	}
@@ -28,14 +32,19 @@ var TrueSmoothItem = function(el, instance) {
 	return this;
 };
 
-
-TrueSmoothItem.prototype.scroll = function(scrollY) {
+/**
+ * scroll() is fired when the item is scrolling to anchor point
+ *
+ * @return void
+ */
+TrueSmoothItem.prototype.scroll = function() {
 	if (this.state !== "scroll") {
 		this.el.style.position = "fixed";
 		this.state = "scroll";
+		this.el.dispatchEvent(this.startScrollEvent);
 	}
 	// get ratio adjusted scroll distance
-	this.scrollYOffset = (scrollY*this.scrollRatio) - scrollY;
+	this.scrollYOffset = (this.instance.scrollY*this.scrollRatio) - this.instance.scrollY;
 	// calculate offset Y and translate
 	let offsetY = 0;
 	    offsetY += parseInt(this.initialStyle.top);
@@ -44,7 +53,12 @@ TrueSmoothItem.prototype.scroll = function(scrollY) {
 	this.el.style.transform = "translate3d(0, "+offsetY+"px, 0)";
 };
 
-TrueSmoothItem.prototype.scrollAnchor = function(scrollY) {
+/**
+ * scrollAnchor() is fired when item has reached its anchor point
+ *
+ * @return void
+ */
+TrueSmoothItem.prototype.scrollAnchor = function() {
 	if (this.state === "anchored") return;
 	this.state = "anchored";
 
@@ -55,17 +69,23 @@ TrueSmoothItem.prototype.scrollAnchor = function(scrollY) {
 		offsetY -= parseInt(this.el.offsetHeight);
 	}
 	this.el.style.transform = "translate3d(0, "+offsetY+"px, 0)";
+	// fire stop scroll event
+	this.el.dispatchEvent(this.endScrollEvent);
 };
 
-
-TrueSmoothItem.prototype.getOffsetY = function(scrollY) {
+/**
+ * getOffsetY() returns the vertical offset position of the item
+ *
+ * @return int
+ */
+TrueSmoothItem.prototype.getOffsetY = function() {
 	let offsetY = this.offsetY;
 	// offset by height of element if point is bottom
 	if (this.anchor.itemPoint === "bottom") {
 		offsetY += this.el.offsetHeight;
 	}
 	// offset by the scroll distance
-	offsetY += scrollY;
+	offsetY += this.instance.scrollY;
 	// offset by scrollYOffset distance
 	offsetY += this.scrollYOffset;
 
