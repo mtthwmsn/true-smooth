@@ -7,6 +7,7 @@ var TrueSmooth = function(el) {
 	this.container = el;
 	this.items = [];
 	this.scrollY = 0;
+	this.scrollDir = null;
 	registerItems();
 
 	this.getItems = function() {
@@ -19,6 +20,7 @@ var TrueSmooth = function(el) {
 	this.service.onScroll((scroll) => {
 		// update the vertical scroll position in this instance
 		this.scrollY = scroll.y;
+		this.scrollDir = scroll.dir;
 		// scroll or anchor each item
 		this.items.forEach((item) => {
 			if (item.getOffsetY(scroll.y) > item.anchor.offsetY)

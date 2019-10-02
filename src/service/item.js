@@ -10,6 +10,7 @@ var TrueSmoothItem = function(el, instance) {
 	this.scrollYOffset = 0;
 	this.zIndex = el.dataset.zIndex || 1;
 	this.scrollRatio = el.dataset.scrollRatio || 1;
+	this.scrollSpring = el.dataset.scrollSpring || 1;
 	this.initialStyle = {};
 
 	// create events to fire on start/stop scroll
@@ -38,10 +39,15 @@ var TrueSmoothItem = function(el, instance) {
  * @return void
  */
 TrueSmoothItem.prototype.scroll = function() {
+	var snapBack = false;
 	if (this.state !== "scroll") {
 		this.el.style.position = "fixed";
 		this.state = "scroll";
 		this.el.dispatchEvent(this.startScrollEvent);
+		if (this.instance.scrollDir === "down")
+			this.enableSmoothScroll();
+		else
+			snapBack = true;
 	}
 	// get ratio adjusted scroll distance
 	this.scrollYOffset = (this.instance.scrollY*this.scrollRatio) - this.instance.scrollY;
@@ -51,6 +57,13 @@ TrueSmoothItem.prototype.scroll = function() {
 	    offsetY += parseInt(this.initialStyle.marginTop);
 	    offsetY += this.scrollYOffset;
 	this.el.style.transform = "translate3d(0, "+offsetY+"px, 0)";
+	// enable scroll after transform has been set
+	if (snapBack === true) {
+		var context = this;
+		setTimeout(function() {
+			context.enableSmoothScroll();
+		}, 0);
+	}
 };
 
 /**
@@ -62,6 +75,7 @@ TrueSmoothItem.prototype.scrollAnchor = function() {
 	if (this.state === "anchored") return;
 	this.state = "anchored";
 
+	this.disableSmoothScroll();
 	// fix absolutely to anchor point
 	this.el.style.position = "absolute";
 	let offsetY = this.anchor.offsetY;
@@ -113,9 +127,25 @@ TrueSmoothItem.prototype.setInitialStyle = function() {
 	this.el.style.transform = "translate3d(0, "+offsetY+"px, 0)";
 	// update offsetY
 	this.offsetY = offsetY;
+};
 
-	// do the smooth
-	//this.el.style.transition = "transform 0.1s ease";
+/**
+ * enableSmoothScroll()
+ *
+ * @return void
+ */
+TrueSmoothItem.prototype.enableSmoothScroll = function() {
+	let spring = this.scrollSpring * 0.1;
+	this.el.style.transition = "transform "+spring+"s ease";
+};
+
+/**
+ * disableSmoothScroll()
+ *
+ * @return
+ */
+TrueSmoothItem.prototype.disableSmoothScroll = function() {
+	this.el.style.transition = null;
 };
 
 /**
