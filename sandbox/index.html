@@ -14,17 +14,15 @@
 		     data-anchor="_parent:bottom:bottom:1000"
 		     data-index="1"
 		     data-scroll-ratio="1.5"
-		     data-scroll-spring="3">
+		     data-scroll-spring="1">
 			Index 1
 		</div>
-		<!--
 		<div class="test-item test-item--2"
 		     data-true-smooth-item
 		     data-index="2"
 		     data-scroll-ratio="2">
 			Index 2
 		</div>
-	-->
 	</section>
 	<div class="content">
 		content here below the scroll
@@ -36,10 +34,17 @@
 	var test = new TrueSmooth(container);
 	var testItems = test.getItems();
 	// example of events
-	testItems[0].addEventListener("ts.scrollitem.start", function() {
+	//testItems[0].addEventListener("ts.scrollitem.start", function() {
+	//	console.log('first item started scrolling');
+	//});
+	//testItems[0].addEventListener("ts.scrollitem.stop", function() {
+	//	console.log('first item stopped scrolling');
+	//});
+	// example of events
+	testItems[1].addEventListener("ts.scrollitem.start", function() {
 		console.log('first item started scrolling');
 	});
-	testItems[0].addEventListener("ts.scrollitem.stop", function() {
+	testItems[1].addEventListener("ts.scrollitem.stop", function() {
 		console.log('first item stopped scrolling');
 	});
 	</script>

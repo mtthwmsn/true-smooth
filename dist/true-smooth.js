@@ -134,10 +134,11 @@ TrueSmoothItem.prototype.scroll = function() {
 	this.scrollYOffset = (this.instance.scrollY*this.scrollRatio) - this.instance.scrollY;
 	// calculate offset Y and translate
 	let offsetY = 0;
-	    offsetY += parseInt(this.initialStyle.top);
-	    offsetY += parseInt(this.initialStyle.marginTop);
+	    offsetY += parseInt(this.initialStyle.top) || 0;
+	    offsetY += parseInt(this.initialStyle.marginTop) || 0;
 	    offsetY += this.scrollYOffset;
 	this.el.style.transform = "translate3d(0, "+offsetY+"px, 0)";
+
 	// enable scroll after transform has been set
 	if (snapBack === true) {
 		var context = this;
@@ -203,8 +204,8 @@ TrueSmoothItem.prototype.setInitialStyle = function() {
 	this.el.style.top = "0px";
 	this.el.style.marginTop = "0px";
 	let offsetY = 0;
-	    offsetY += parseInt(this.initialStyle.top);
-	    offsetY += parseInt(this.initialStyle.marginTop);
+	    offsetY += parseInt(this.initialStyle.top) || 0;
+	    offsetY += parseInt(this.initialStyle.marginTop) || 0;
 	this.el.style.transform = "translate3d(0, "+offsetY+"px, 0)";
 	// update offsetY
 	this.offsetY = offsetY;
